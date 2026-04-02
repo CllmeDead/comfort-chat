@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
 
 DATABASE = 'comfort_chat.db'
 
@@ -27,12 +27,17 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize database when app starts
-with app.app_context():
-    init_db()
+# Track if DB is initialized
+db_initialized = False
 
 @app.before_request
 def ensure_token():
+    global db_initialized
+    # Initialize DB on first request
+    if not db_initialized:
+        init_db()
+        db_initialized = True
+
     if 'user_token' not in session:
         session['user_token'] = str(uuid.uuid4())
 
@@ -65,10 +70,6 @@ def send_message():
 
 @app.route('/api/receive')
 def receive_message():
-    # Get a message that:
-    # 1. Hasn't been replied to yet
-    # 2. Isn't from the current user
-    # 3. Oldest first (waiting longest)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute('''
@@ -105,7 +106,6 @@ def reply_message():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
-    # Check message exists and isn't already replied
     c.execute('SELECT replier_token FROM messages WHERE id = ?', (message_id,))
     row = c.fetchone()
 
@@ -133,7 +133,6 @@ def my_messages():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
-    # Messages I sent that got replies
     c.execute('''
         SELECT id, content, reply_content, replied_at, is_read
         FROM messages
@@ -149,7 +148,6 @@ def my_messages():
         'is_read': r[4]
     } for r in c.fetchall()]
 
-    # Messages I replied to
     c.execute('''
         SELECT id, content, reply_content
         FROM messages
