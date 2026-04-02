@@ -27,6 +27,10 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Initialize database when app starts
+with app.app_context():
+    init_db()
+
 @app.before_request
 def ensure_token():
     if 'user_token' not in session:
@@ -199,5 +203,4 @@ def stats():
     })
 
 if __name__ == '__main__':
-    init_db()
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
