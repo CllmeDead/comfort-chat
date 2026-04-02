@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Comfort Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #faf8f5;
+            --bg-glass: rgba(255, 255, 255, 0.65);
+            --bg-glass-hover: rgba(255, 255, 255, 0.85);
+            --text-primary: #3d3d3d;
+            --text-secondary: #6b6b6b;
+            --text-muted: #999;
+            --accent: #8b7355;
+            --accent-light: #a68b6a;
+            --border: rgba(255, 255, 255, 0.5);
+            --shadow: rgba(139, 115, 85, 0.08);
+            --shadow-lg: rgba(139, 115, 85, 0.15);
+            --success: #7a9e7a;
+            --warm: #c4a77d;
+            --gradient-1: #faf8f5;
+            --gradient-2: #f5f1eb;
+            --gradient-3: #ebe5dc;
+            --gradient-4: #e8dfd1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Gradient Mesh Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(196, 167, 125, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 115, 85, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(235, 229, 220, 0.5) 0%, transparent 70%),
+                linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%);
+            animation: meshMove 20s ease-in-out infinite;
+        }
+
+        @keyframes meshMove {
+            0%, 100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%;
+                filter: hue-rotate(0deg);
+            }
+            25% {
+                background-position: 30% 20%, 70% 80%, 40% 60%, 0% 0%;
+            }
+            50% {
+                background-position: 20% 30%, 80% 70%, 60% 40%, 0% 0%;
+                filter: hue-rotate(5deg);
+            }
+            75% {
+                background-position: 40% 10%, 60% 90%, 30% 70%, 0% 0%;
+            }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 115, 85, 0.15);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header with Glassmorphism */
+        header {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg,
+                rgba(250, 248, 245, 0.9) 0%,
+                rgba(250, 248, 245, 0.4) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        h1 {
+            font-family: 'Crimson Text', Georgia, serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            animation: fadeInUp 1s ease;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 300;
+            max-width: 450px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease 0.2s backwards;
+            line-height: 1.8;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation with Glassmorphism */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(139, 115, 85, 0.05);
+        }
+
+        nav button {
+            padding: 0.85rem 2rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(139, 115, 85, 0.1), rgba(196, 167, 125, 0.1));
+            border-radius: 50px;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        nav button:hover {
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        nav button:hover::before {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        nav button.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.12);
+        }
+
+        nav button.active::before {
+            display: none;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            display: none;
+            animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.98) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            box-shadow:
+                0 8px 32px var(--shadow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            background: var(--bg-glass-hover);
+            box-shadow:
+                0 12px 48px var(--shadow-lg),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: translateY(-4px);
+        }
+
+        .card h2 {
+            font-family: 'Crimson Text', Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        /* Textareas with Glassmorphism */
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 1.25rem;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            border-radius: 16px;
+            font-family: 'Crimson Text', Georgia, serif;
+            font-size: 1.1rem;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-primary);
+            line-height: 1.8;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 8px rgba(139, 115, 85, 0.03);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(139, 115, 85, 0.3);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow:
+                inset 0 2px 8px rgba(139, 115, 85, 0.05),
+                0 0 0 4px rgba(139, 115, 85, 0.08);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Buttons with Micro-interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(139, 115, 85, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
+            border: 1px solid rgba(139, 115, 85, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Message Displays with Glassmorphism */
+        .message-display {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--warm);
+            font-family: 'Crimson Text', Georgia, serif;
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: var(--text-primary);
+            box-shadow:
+                0 4px 20px rgba(139, 115, 85, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            animation: fadeInLeft 0.6s ease;
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .reply-display {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1rem 0 1.5rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-left: 4px solid var(--success);
+            box-shadow:
+                0 4px 20px rgba(139, 115, 85, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            animation: fadeInRight 0.6s ease 0.1s backwards;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.6;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state h2 {
+            font-family: 'Crimson Text', Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        /* Glassmorphism Stats Bar */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow:
+                0 8px 32px rgba(139, 115, 85, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            animation: fadeInUp 0.8s ease 0.3s backwards;
+        }
+
+        .stat {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: rgba(139, 115, 85, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent);
+            font-family: 'Crimson Text', Georgia, serif;
+            transition: all 0.4s ease;
+        }
+
+        .stat:hover .stat-value {
+            transform: scale(1.1);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        /* Toast Notifications */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1.25rem 2rem;
+            border-radius: 16px;
+            color: white;
+            font-weight: 500;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: rgba(122, 158, 122, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .notification.error {
+            background: rgba(176, 112, 112, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(139, 115, 85, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(139, 115, 85, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 115, 85, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 115, 85, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.25rem; }
+            .card { padding: 1.75rem; border-radius: 20px; }
+            .stats {
+                flex-direction: column;
+                gap: 1.25rem;
+                padding: 1.25rem;
+            }
+            .stat:not(:last-child)::after {
+                display: none;
+            }
+            nav button {
+                padding: 0.7rem 1.25rem;
+                font-size: 0.85rem;
+            }
+            .reply-display {
+                margin-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <div class="particles" id="particles"></div>
+
+    <header>
+        <h1>Anonymous Comfort Chat</h1>
+        <p class="tagline">Slow, thoughtful connection — human to human,<br>no names, no judgment</p>
+    </header>
+
+    <nav>
+        <button class="active" onclick="showSection('send')">Send Comfort</button>
+        <button onclick="showSection('receive')">Receive & Reply</button>
+        <button onclick="showSection('history')">Your Connections</button>
+    </nav>
+
+    <main>
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalMessages">-</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="repliedMessages">-</div>
+                <div class="stat-label">Connections Made</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="waitingMessages">-</div>
+                <div class="stat-label">Waiting for Comfort</div>
+            </div>
+        </div>
+
+        <!-- Send Section -->
+        <section id="send" class="section active">
+            <div class="card">
+                <h2>Share what's on your heart</h2>
+                <p>Write something you'd like to share. Someone kind will read it and reply with comfort. No one knows who you are.</p>
+                <textarea id="messageInput" placeholder="What's weighing on you? What's bringing you joy? What's confusing you? Share it here... Someone is listening."></textarea>
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    Send into the void →
+                </button>
+            </div>
+        </section>
+
+        <!-- Receive Section -->
+        <section id="receive" class="section">
+            <div class="card" id="receiveCard">
+                <h2>Someone needs comfort</h2>
+                <p>Read a message from someone who needs a kind word. Take your time. Be gentle.</p>
+                <button class="btn btn-primary" onclick="findMessage()">
+                    Read a message
+                </button>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history" class="section">
+            <div id="historyContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading your connections...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (section === 'history') loadHistory();
+            if (section === 'send') updateStats();
+        }
+
+        // Notifications
+        function notify(message, type = 'success') {
+            const n = document.createElement('div');
+            n.className = `notification ${type}`;
+            n.textContent = message;
+            document.body.appendChild(n);
+            setTimeout(() => {
+                n.style.animation = 'slideInRight 0.4s ease reverse';
+                setTimeout(() => n.remove(), 400);
+            }, 3000);
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (content.length < 10) {
+                notify('Please share a bit more — at least a few sentences', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    notify('Your message has been sent. Someone will reply soon.');
+                    input.value = '';
+                    updateStats();
+                } else {
+                    notify(data.error, 'error');
+                }
+            } catch (e) {
+                notify('Something went wrong. Please try again.', 'error');
+            }
+        }
+
+        // Find message to reply to
+        async function findMessage() {
+            const card = document.getElementById('receiveCard');
+            card.innerHTML = '<div class="loading"><div class="spinner"></div><p>Looking for someone who needs comfort...</p></div>';
+
+            try {
+                const res = await fetch('/api/receive');
+                const data = await res.json();
+
+                if (data.found) {
+                    const msg = data.message;
+                    card.innerHTML = `
+                        <div class="meta">Someone shared this...</div>
+                        <div class="message-display">${escapeHtml(msg.content)}</div>
+                        <textarea id="replyInput" placeholder="Write a kind, thoughtful reply. What would you want to hear if this were you?"></textarea>
+                        <button class="btn btn-primary" onclick="sendReply('${msg.id}')">
+                            Send comfort back
+                        </button>
+                        <button class="btn btn-secondary" onclick="skipMessage()" style="margin-left: 1rem;">
+                            Skip this one
+                        </button>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌙</div>
+                            <h2>No messages waiting</h2>
+                            <p>Everyone is being cared for right now. That's beautiful.<br>Check back later?</p>
+                            <button class="btn btn-secondary" onclick="resetReceive()">Check again</button>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                notify('Failed to fetch message', 'error');
+                resetReceive();
+            }
+        }
+
+        // Send reply
+        async function sendReply(messageId) {
+            const input = document.getElementById('replyInput');
+            const reply = input.value.trim();
+
+            if (reply.length < 10) {
+                notify('Please write a more thoughtful reply', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_id: messageId, reply })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    notify('Your kindness has been sent. Thank you for caring.');
+                    resetReceive();
+                    updateStats();
+                } else {
+                    notify(data.error, 'error');
+                }
+            } catch (e) {
+                notify('Failed to send reply', 'error');
+            }
+        }
+
+        // Skip/reset
+        function skipMessage() {
+            resetReceive();
+            setTimeout(findMessage, 100);
+        }
+
+        function resetReceive() {
+            document.getElementById('receiveCard').innerHTML = `
+                <h2>Someone needs comfort</h2>
+                <p>Read a message from someone who needs a kind word. Take your time. Be gentle.</p>
+                <button class="btn btn-primary" onclick="findMessage()">
+                    Read a message
+                </button>
+            `;
+        }
+
+        // Load history
+        async function loadHistory() {
+            const container = document.getElementById('historyContent');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading your connections...</p></div>';
+
+            try {
+                const res = await fetch('/api/my-messages');
+                const data = await res.json();
+
+                let html = '';
+
+                // Replies to my messages
+                if (data.received_replies.length > 0) {
+                    html += '<div class="card"><h2>Comfort you received</h2>';
+                    data.received_replies.forEach(m => {
+                        html += `
+                            <div style="margin-bottom: 2rem;">
+                                <div class="meta">You wrote</div>
+                                <div class="message-display">${escapeHtml(m.my_message)}</div>
+                                <div class="reply-display">
+                                    <div class="meta">Someone replied</div>
+                                    <p style="font-family: 'Crimson Text', Georgia, serif; font-size: 1.15rem; color: var(--text-primary); line-height: 1.8;">
+                                        ${escapeHtml(m.their_reply)}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                // My replies to others
+                if (data.sent_replies.length > 0) {
+                    html += '<div class="card"><h2>Comfort you gave</h2>';
+                    data.sent_replies.forEach(m => {
+                        html += `
+                            <div style="margin-bottom: 2rem;">
+                                <div class="meta">Someone was feeling</div>
+                                <div class="message-display" style="border-left-color: var(--success);">${escapeHtml(m.their_message)}</div>
+                                <div class="reply-display">
+                                    <div class="meta">You replied</div>
+                                    <p style="font-family: 'Crimson Text', Georgia, serif; font-size: 1.15rem; line-height: 1.8;">
+                                        ${escapeHtml(m.my_reply)}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                if (!html) {
+                    html = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌱</div>
+                            <h2>Your story is just beginning</h2>
+                            <p>You haven't sent or received comfort yet.<br>Take the first step?</p>
+                            <button class="btn btn-primary" onclick="showSection('send'); document.querySelector('nav button').click();">
+                                Send a message
+                            </button>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<p class="empty-state">Failed to load history</p>';
+            }
+        }
+
+        // Update stats
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('totalMessages').textContent = data.total_messages;
+                document.getElementById('repliedMessages').textContent = data.replied_messages;
+                document.getElementById('waitingMessages').textContent = data.waiting_messages;
+            } catch (e) {
+                console.log('Failed to load stats');
+            }
+        }
+
+        // Utility
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Init
+        updateStats();
+        setInterval(updateStats, 30000);
+    </script>
+</body>
+</html>
